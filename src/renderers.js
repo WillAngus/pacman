@@ -50,7 +50,7 @@ var initRenderer = function(){
     var scale = 2;        // scale everything by this amount
 
     // (temporary global version of scale just to get things quickly working)
-    renderScale = scale; 
+    renderScale = scale;
 
     var resets = 0;
 
@@ -138,7 +138,7 @@ var initRenderer = function(){
     //////////////////////
 
     var beginMapFrame = function() {
-        bgCtx.fillStyle = "#000";
+        bgCtx.fillStyle = renderer.backColor;
         bgCtx.fillRect(0,0,mapWidth,mapHeight);
         bgCtx.translate(mapPad, mapPad);
     };
@@ -175,7 +175,7 @@ var initRenderer = function(){
 
             // subtract one from size due to shift done for sprite realignment?
             // (this fixes a bug that leaves unerased artifacts after actors use right-side tunnel
-            ctx.rect(-mapPad,-mapPad,mapWidth-1,mapHeight-1); 
+            ctx.rect(-mapPad,-mapPad,mapWidth-1,mapHeight-1);
 
             ctx.clip();
         },
@@ -320,13 +320,13 @@ var initRenderer = function(){
                 tile.y += dir.y;
             }
             var pixel = { x:tile.x*tileSize+midTile.x, y:tile.y*tileSize+midTile.y };
-            
+
             // dist keeps track of how far we're going along this path, stopping at maxDist
             // distLeft determines how long the last line should be
             var dist = Math.abs(tile.x*tileSize+midTile.x - actor.pixel.x + tile.y*tileSize+midTile.y - actor.pixel.y);
             var maxDist = actorPathLength*tileSize;
             var distLeft;
-            
+
             // add the first line
             ctx.strokeStyle = actor.pathColor;
             ctx.lineWidth = "2.0";
@@ -352,10 +352,10 @@ var initRenderer = function(){
                     map.constrainGhostTurns(tile, openTiles, dirEnum);
                 dirEnum = getTurnClosestToTarget(tile, target, openTiles);
                 setDirFromEnum(dir,dirEnum);
-                
+
                 // if the next tile is our target, determine how mush distance is left and break loop
                 if (tile.x+dir.x == target.x && tile.y+dir.y == target.y) {
-                
+
                     // adjust the distance left to create a smoothly interpolated path end
                     distLeft = actor.getPathDistLeft(pixel, dirEnum);
 
@@ -364,7 +364,7 @@ var initRenderer = function(){
 
                     break;
                 }
-                
+
                 // exit if we're going past the max distance
                 if (dist + tileSize > maxDist) {
                     distLeft = maxDist - dist;
@@ -400,7 +400,7 @@ var initRenderer = function(){
                 ctx.lineTo(px-s*dir.y,py-s*dir.y);
             }
 
-            // draw path    
+            // draw path
             ctx.stroke();
         },
 
@@ -648,6 +648,9 @@ var initRenderer = function(){
         this.pelletSize = 2;
         this.energizerSize = tileSize;
 
+		this.dynamicBackground = true;
+		this.backgroundAlpha = 1;
+		this.backgroundBlur = 0;
         this.backColor = "#000";
         this.floorColor = "#000";
         this.flashWallColor = "#FFF";
@@ -659,10 +662,18 @@ var initRenderer = function(){
 
         // copy background canvas to the foreground canvas
         blitMap: function() {
+			ctx.save();
+
+			if (this.dynamicBackground) {
+				ctx.globalAlpha = this.backgroundAlpha;
+				ctx.filter = 'blur('+ this.backgroundBlur +'px)';
+			}
             ctx.scale(1/scale,1/scale);
             ctx.drawImage(bgCanvas,-1-mapPad*scale,-1-mapPad*scale); // offset map to compenstate for misalignment
             ctx.scale(scale,scale);
             //ctx.clearRect(-mapPad,-mapPad,mapWidth,mapHeight);
+
+			ctx.restore();
         },
 
         drawMap: function(isCutscene) {
@@ -697,6 +708,10 @@ var initRenderer = function(){
                     bgCtx.fillStyle = "#000";
                     bgCtx.strokeStyle = "#fff";
                 }
+				else if (this.dynamicBackground) {
+					bgCtx.fillStyle   = 'hsl('+pacman.frames+',  72%, 72%)';
+					bgCtx.strokeStyle = 'hsl('+pacman.frames+', 100%, 25%)';
+				}
                 else {
                     bgCtx.fillStyle = map.wallFillColor;
                     bgCtx.strokeStyle = map.wallStrokeColor;
@@ -851,7 +866,7 @@ var initRenderer = function(){
             if (!isTranslated) {
                 bgCtx.translate(mapPad,mapPad);
             }
-            bgCtx.fillStyle = "#000";
+            bgCtx.fillStyle = this.backColor;
             var i = map.posToIndex(x,y);
             var size = map.tiles[i] == 'o' ? this.energizerSize : this.pelletSize;
             this.drawCenterTileSq(bgCtx,x,y,size+2);

@@ -60,6 +60,12 @@ var energizer = (function() {
         save: save,
         load: load,
         reset: function() {
+			renderer.backgroundAlpha = 1;
+			// renderer.backgroundBlur = 0;
+
+			audio.audioGroup.removeEffect(delay);
+			audio.audioGroup.removeEffect(reverb);
+
             audio.ghostTurnToBlue.stopLoop();
             count = 0;
             active = false;
@@ -77,8 +83,14 @@ var energizer = (function() {
                     count++;
             }
         },
-        activate: function() { 
-            audio.ghostNormalMove.stopLoop();
+        activate: function() {
+			renderer.backgroundAlpha = 0.25;
+			// renderer.backgroundBlur = 2;
+
+			audio.audioGroup.addEffect(delay);
+			audio.audioGroup.addEffect(reverb);
+
+			audio.ghostNormalMove.stopLoop();
             audio.ghostTurnToBlue.startLoop();
             active = true;
             count = 0;
@@ -91,7 +103,7 @@ var energizer = (function() {
             }
         },
         isActive: function() { return active; },
-        isFlash: function() { 
+        isFlash: function() {
             var i = Math.floor((getDuration()-count)/flashInterval);
             return (i<=2*getFlashes()-1) ? (i%2==0) : false;
         },

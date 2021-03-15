@@ -87,7 +87,7 @@ Player.prototype.getAnimFrame = function(frame) {
             frame = 1; // hack to force this frame when dead
     }
     if (gameMode != GAME_OTTO) {
-        if (frame == 3) 
+        if (frame == 3)
             frame = 1;
     }
     return frame;

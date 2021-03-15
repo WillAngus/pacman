@@ -1,18 +1,53 @@
 /* Sound handlers added by Dr James Freeman who was sad such a great reverse was a silent movie  */
 
-var audio = new preloadAudio();
+// Pizzicato audio library variables / effects
+var reverb = new Pizzicato.Effects.Reverb({
+    time: 1.5,
+    decay: 0.01,
+    reverse: false,
+    mix: 0.6
+});
+var delay = new Pizzicato.Effects.DubDelay({
+    feedback: 0.6,
+    time: 0.5,
+    mix: 0.5,
+	cutoff: 700
+});
+var audioIn = new Pizzicato.Sound({
+	source: 'input',
+	options: { volume: 1 }
+});
+
+var audioArray = [];
+var audio      = new preloadAudio();
+
+function createAudioGroup() {
+	audio.audioGroup = new Pizzicato.Group(audioArray);
+}
 
 function audioTrack(url, volume) {
-    var audio = new Audio(url);
+    // var audio = new Audio(url);
+	var audio = new Pizzicato.Sound(url, function() {
+		audioArray.push(audio);
+		console.log(url + ' loaded.');
+		if (audioArray.length == 15) {
+			createAudioGroup();
+			console.log('all audio loaded.')
+		}
+	});
+
     if (volume) audio.volume = volume;
-    audio.load();
+
+	this.src = audio;
+
     var looping = false;
     this.play = function(noResetTime) {
         playSound(noResetTime);
     };
     this.startLoop = function(noResetTime) {
         if (looping) return;
-        audio.addEventListener('ended', audioLoop);
+        // audio.addEventListener('ended', audioLoop);
+		audio.on('end', audioLoop);
         audioLoop(noResetTime);
         looping = true;
     };
@@ -27,7 +62,7 @@ function audioTrack(url, volume) {
     };
     this.isPaused = function() {
         return audio.paused;
-    }; 
+    };
     this.stop = this.stopLoop;
 
     function audioLoop(noResetTime) {
@@ -44,13 +79,15 @@ function audioTrack(url, volume) {
             if(playPromise) {
                 playPromise.then(function(){}).catch(function(err){});
             }
-        } 
+        }
         catch(err){ console.error(err) }
     }
 }
 
 
 function preloadAudio() {
+
+	this.audioGroup;
 
     this.credit            = new audioTrack('sounds/credit.mp3');
     this.coffeeBreakMusic  = new audioTrack('sounds/coffee-break-music.mp3');

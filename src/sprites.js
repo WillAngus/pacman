@@ -462,7 +462,7 @@ var drawPacPoints = (function(){
         draw0(-1,-3);
         draw0(4,-3);
     };
-    
+
     var draw400 = function() {
         draw4(-7,-3);
         draw0(-1,-3);
@@ -493,7 +493,7 @@ var drawPacPoints = (function(){
         draw0(1,-3);
         draw0(6,-3);
     };
-    
+
     var draw1600 = function() {
         draw1narrow(-7,-3);
         draw6(-5,-3);
@@ -871,7 +871,7 @@ var drawMonsterSprite = (function(){
         ctx.translate(1,0);
         drawRight0();
     };
-    
+
     var drawLeft1 = function() {
         ctx.scale(-1,1);
         ctx.translate(1,0);
@@ -1519,7 +1519,32 @@ var drawGiantPacmanSprite = function(ctx,x,y,dirEnum,frame) {
 
     ctx.restore();
 };
+/*
+var image = new Image();
+image.src = 'https://github.com/WillAngus/cereal-engine/blob/master/game/assets/img/slayer/spr_player_org.png?raw=true';
 
+var drawMsPacmanSprite = function(ctx,x,y,dirEnum,frame,rot_angle) {
+
+	ctx.save();
+    ctx.translate(x,y);
+    if (rot_angle) {
+        ctx.rotate(rot_angle);
+    }
+
+    // reflect or rotate sprite according to current direction
+    var d90 = Math.PI/2;
+    if (dirEnum == DIR_UP)
+        ctx.rotate(-d90);
+    else if (dirEnum == DIR_DOWN)
+        ctx.rotate(d90);
+    else if (dirEnum == DIR_LEFT)
+        ctx.scale(-1,1);
+
+	ctx.drawImage(image, -8, -8, 16, 16);
+
+	ctx.restore();
+}
+*/
 var drawMsPacmanSprite = function(ctx,x,y,dirEnum,frame,rot_angle) {
     var angle = 0;
 
