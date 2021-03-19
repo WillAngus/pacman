@@ -1,7 +1,8 @@
 // Modules to control application life and create native browser window
 const {
 	app,
-	BrowserWindow
+	BrowserWindow,
+	systemPreferences
 } = require('electron')
 const path = require('path')
 
@@ -21,6 +22,8 @@ function createWindow() {
 
 	// Open the DevTools.
 	mainWindow.webContents.openDevTools()
+
+	//systemPreferences.askForMediaAccess('microphone');
 }
 
 // This method will be called when Electron has finished

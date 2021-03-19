@@ -708,9 +708,22 @@ var initRenderer = function(){
                     bgCtx.fillStyle = "#000";
                     bgCtx.strokeStyle = "#fff";
                 }
-				else if (this.dynamicBackground) {
-					bgCtx.fillStyle   = 'hsl('+pacman.frames+',  72%, 72%)';
-					bgCtx.strokeStyle = 'hsl('+pacman.frames+', 100%, 25%)';
+				else if (this.dynamicBackground && audioAnalyser !== undefined) {
+					/* Cycle through colours */
+					// bgCtx.fillStyle   = 'hsl('+pacman.frames+',  72%, 72%)';
+					// bgCtx.strokeStyle = 'hsl('+pacman.frames+', 100%, 25%)';
+
+					/* Change rgb based on frequency bands */
+					bgCtx.fillStyle   = 'rgb('+audioAnalyser.low*1.5+', '+audioAnalyser.mid*  1+', '+audioAnalyser.high*  6+')';
+					bgCtx.strokeStyle = 'rgb('+audioAnalyser.low*  2+', '+audioAnalyser.mid*1.5+', '+audioAnalyser.high*6.5+')';
+
+					/* Change hue based on audio volume */
+					bgCtx.fillStyle   = 'hsl('+audioAnalyser.signal_volume+',  72%, 72%)';
+					bgCtx.strokeStyle = 'hsl('+audioAnalyser.signal_volume+', 100%, 25%)';
+
+					/* Change hue based on audio bands */
+					// bgCtx.fillStyle   = 'hsl('+audioAnalyser.mid*5+',  '+audioAnalyser.low+'%, '+audioAnalyser.high+'%)';
+					// bgCtx.strokeStyle = 'hsl('+audioAnalyser.mid*5+', 100%, 50%)';
 				}
                 else {
                     bgCtx.fillStyle = map.wallFillColor;

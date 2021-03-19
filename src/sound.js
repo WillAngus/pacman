@@ -1,33 +1,115 @@
-/* Sound handlers added by Dr James Freeman who was sad such a great reverse was a silent movie  */
-
 // Pizzicato audio library variables / effects
-var reverb = new Pizzicato.Effects.Reverb({
+let reverb = new Pizzicato.Effects.Reverb({
     time: 1.5,
     decay: 0.01,
     reverse: false,
     mix: 0.6
 });
-var delay = new Pizzicato.Effects.DubDelay({
+let delay = new Pizzicato.Effects.DubDelay({
     feedback: 0.6,
     time: 0.5,
     mix: 0.5,
 	cutoff: 700
 });
-var audioIn = new Pizzicato.Sound({
+let audioIn = new Pizzicato.Sound({
 	source: 'input',
 	options: { volume: 1 }
 });
 
-var audioArray = [];
-var audio      = new preloadAudio();
+let audioArray = [];
+let audio      = new preloadAudio();
+
+// Audio Analyser class created to enable interaction between audio and the stage
+let audioAnalyser;
+
+class AudioAnalyser {
+	constructor(source, minDb, maxDb, smoothing, ftt, monitor) {
+		let self = this;
+
+		this.monitor  = monitor;
+		this.context  = Pizzicato.context;
+		this.analyser = Pizzicato.context.createAnalyser();
+
+		this.analyser.minDecibels = minDb;
+		this.analyser.maxDecibels = maxDb;
+		this.analyser.smoothingTimeConstant = smoothing;
+
+		this.source = Pizzicato.context.createMediaStreamSource(source.getRawSourceNode().mediaStream);
+		this.source.connect(this.analyser);
+		if (this.monitor) this.source.connect(this.context.destination);
+
+		this.smoothing = smoothing;
+		this.ftt       = ftt;
+		this.data      = new Uint8Array(this.analyser.frequencyBinCount);
+
+		this.low  = 0;
+		this.mid  = 0;
+		this.high = 0;
+
+		this.signal_volume = 0;
+	}
+	run() {
+		this.analyser.getByteFrequencyData(this.data);
+
+		this.signal_volume = this.getVolume() * 5;
+
+		this.low  = this.getBand(1);
+		this.mid  = this.getBand(2);
+		this.high = this.getBand(3);
+	}
+	getVolume() {
+		let values = 0;
+	    let average;
+
+	    let length = this.data.length;
+
+	    // Get all the frequency amplitudes
+	    for (let i = 0; i < length; i++) {
+	        values += this.data[i];
+	    }
+
+	    average = values / length;
+	    return average;
+	}
+	getBand(band) {
+		let values = 0;
+	    let average;
+
+		let min, max;
+	    let length = this.data.length;
+		let size = Math.round(length / 3);
+
+		if (band == 1) min = 0,        max = min + size;
+		if (band == 2) min = size,     max = min + size;
+		if (band == 3) min = size * 2, max = min + size;
+
+
+	    // Get all the frequency amplitudes
+	    for (let i = min; i < max; i++) {
+	        values += this.data[i];
+	    }
+
+	    average = values / size;
+	    return average;
+	}
+	setSmoothingTime(time) {
+		this.analyser.smoothingTimeConstant = time;
+	}
+	setMinDecibels(db) {
+		this.analyser.minDecibels = db;
+	}
+	setMaxDecibels(db) {
+		this.analyser.maxDecibels = db;
+	}
+}
 
 function createAudioGroup() {
 	audio.audioGroup = new Pizzicato.Group(audioArray);
 }
 
 function audioTrack(url, volume) {
-    // var audio = new Audio(url);
 	var audio = new Pizzicato.Sound(url, function() {
+		audio.volume = 0;
 		audioArray.push(audio);
 		console.log(url + ' loaded.');
 		if (audioArray.length == 15) {
@@ -38,7 +120,8 @@ function audioTrack(url, volume) {
 
     if (volume) audio.volume = volume;
 
-	this.src = audio;
+	this.src   = audio;
+	this.muted = true;
 
     var looping = false;
     this.play = function(noResetTime) {
@@ -81,7 +164,7 @@ function audioTrack(url, volume) {
             }
         }
         catch(err){ console.error(err) }
-    }
+	}
 }
 
 

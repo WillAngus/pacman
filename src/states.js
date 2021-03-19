@@ -1286,6 +1286,9 @@ var readyRestartState = newChildObject(readyState, {
 
 var playState = {
     init: function() {
+
+		audioAnalyser = new AudioAnalyser(audioIn, -100, -0.1, 0.97, 2048, false);
+
         if (practiceMode) {
             vcr.reset();
         }
@@ -1326,6 +1329,8 @@ var playState = {
         return false;
     },
     update: function() {
+
+		audioAnalyser.run();
 
         if (vcr.isSeeking()) {
             vcr.seek();
