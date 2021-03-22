@@ -39,6 +39,8 @@
     var keyDownListeners = new KeyEventListener();
     var keyUpListeners = new KeyEventListener();
 
+	var gamepad = new Gamepad();
+
     // helper functions for adding custom key listeners
     var addKeyDown = function(key,callback,isActive) { keyDownListeners.add(key,callback,isActive); };
     var addKeyUp   = function(key,callback,isActive) { keyUpListeners.add(key,callback,isActive); };
@@ -104,6 +106,7 @@
     var KEY_END = 35;
 
     // Custom Key Listeners
+	gamepad.on('connect', e => { console.log(`controller ${e.index} connected!`) });
 
     // Menu Navigation Keys
     var menu;
@@ -114,29 +117,44 @@
         }
         return menu;
     };
+	addKeyDown(KEY_ENTER, function(){ menu.clickCurrentOption(); }, isInMenu);
     addKeyDown(KEY_ESC,   function(){ menu.backButton ? menu.backButton.onclick():0; return true; }, isInMenu);
-    addKeyDown(KEY_ENTER, function(){ menu.clickCurrentOption(); }, isInMenu);
+
+	gamepad.on('press', 'button_1', () => { if ( isInMenu() ) menu.clickCurrentOption() });
+	gamepad.on('press', 'button_2', () => { if ( isInMenu() ) menu.backButton ? menu.backButton.onclick():0; return true; });
+
     var isMenuKeysAllowed = function() {
         var menu = isInMenu();
         return menu && !menu.noArrowKeys;
     };
     addKeyDown(KEY_UP,    function(){ menu.selectPrevOption(); }, isMenuKeysAllowed);
     addKeyDown(KEY_DOWN,  function(){ menu.selectNextOption(); }, isMenuKeysAllowed);
+
+	gamepad.on('press', 'd_pad_up',   () => { if ( isInMenu() ) menu.selectPrevOption(); });
+	gamepad.on('press', 'd_pad_down', () => { if ( isInMenu() ) menu.selectNextOption(); });
+
     var isInGameMenuButtonClickable = function() {
         return hud.isValidState() && !inGameMenu.isOpen();
     };
     addKeyDown(KEY_ESC, function() { inGameMenu.getMenuButton().onclick(); return true; }, isInGameMenuButtonClickable);
 
+	gamepad.on('press', 'start', () => { if (hud.isValidState() && !inGameMenu.isOpen()) inGameMenu.getMenuButton().onclick(); return true; });
+
     // Move Pac-Man
     var isPlayState = function() { return state == learnState || state == newGameState || state == playState || state == readyNewState || state == readyRestartState; };
-    addKeyDown(KEY_LEFT,  function() { pacman.setInputDir(DIR_LEFT); },  isPlayState);
-    addKeyDown(KEY_RIGHT, function() { pacman.setInputDir(DIR_RIGHT); }, isPlayState);
-    addKeyDown(KEY_UP,    function() { pacman.setInputDir(DIR_UP); },    isPlayState);
-    addKeyDown(KEY_DOWN,  function() { pacman.setInputDir(DIR_DOWN); },  isPlayState);
-    addKeyUp  (KEY_LEFT,  function() { pacman.clearInputDir(DIR_LEFT); },  isPlayState);
-    addKeyUp  (KEY_RIGHT, function() { pacman.clearInputDir(DIR_RIGHT); }, isPlayState);
-    addKeyUp  (KEY_UP,    function() { pacman.clearInputDir(DIR_UP); },    isPlayState);
-    addKeyUp  (KEY_DOWN,  function() { pacman.clearInputDir(DIR_DOWN); },  isPlayState);
+    addKeyDown(KEY_LEFT,  function() { pacman.setInputDir(DIR_LEFT)    }, isPlayState);
+    addKeyDown(KEY_RIGHT, function() { pacman.setInputDir(DIR_RIGHT)   }, isPlayState);
+    addKeyDown(KEY_UP,    function() { pacman.setInputDir(DIR_UP)      }, isPlayState);
+    addKeyDown(KEY_DOWN,  function() { pacman.setInputDir(DIR_DOWN)    }, isPlayState);
+    addKeyUp  (KEY_LEFT,  function() { pacman.clearInputDir(DIR_LEFT)  }, isPlayState);
+    addKeyUp  (KEY_RIGHT, function() { pacman.clearInputDir(DIR_RIGHT) }, isPlayState);
+    addKeyUp  (KEY_UP,    function() { pacman.clearInputDir(DIR_UP)    }, isPlayState);
+    addKeyUp  (KEY_DOWN,  function() { pacman.clearInputDir(DIR_DOWN)  }, isPlayState);
+
+	gamepad.on('hold', 'd_pad_up',    () => { if (isPlayState) pacman.setInputDir(DIR_UP)    });
+	gamepad.on('hold', 'd_pad_down',  () => { if (isPlayState) pacman.setInputDir(DIR_DOWN)  });
+	gamepad.on('hold', 'd_pad_left',  () => { if (isPlayState) pacman.setInputDir(DIR_LEFT)  });
+	gamepad.on('hold', 'd_pad_right', () => { if (isPlayState) pacman.setInputDir(DIR_RIGHT) });
 
     // Slow-Motion
     var isPracticeMode = function() { return isPlayState() && practiceMode; };
