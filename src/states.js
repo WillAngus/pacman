@@ -105,6 +105,7 @@ var homeState = (function(){
     menu.addTextIconButton(getGameName(GAME_PACMAN),
         function() {
             gameMode = GAME_PACMAN;
+			renderer.dynamicBackground = false;
             exitTo(preNewGameState);
         },
         function(ctx,x,y,frame) {
@@ -113,6 +114,7 @@ var homeState = (function(){
     menu.addTextIconButton(getGameName(GAME_MSPACMAN),
         function() {
             gameMode = GAME_MSPACMAN;
+			renderer.dynamicBackground = false;
             exitTo(preNewGameState);
         },
         function(ctx,x,y,frame) {
@@ -121,13 +123,39 @@ var homeState = (function(){
     menu.addTextIconButton(getGameName(GAME_COOKIE),
         function() {
             gameMode = GAME_COOKIE;
+			renderer.dynamicBackground = false;
             exitTo(preNewGameState);
         },
         function(ctx,x,y,frame) {
             drawCookiemanSprite(ctx,x,y,DIR_RIGHT,getIconAnimFrame(frame), true);
         });
+	menu.addTextIconButton('CRAZY OTTO',
+        function() {
+            gameMode = GAME_OTTO;
+			renderer.dynamicBackground = false;
+            exitTo(preNewGameState);
+        },
+        function(ctx,x,y,frame) {
+            drawOttoSprite(ctx,x,y,DIR_RIGHT,getIconAnimFrame(frame));
+        });
+	menu.addTextIconButton('CUSTOM',
+        function() {
+            gameMode = GAME_MSPACMAN;
+			renderer.dynamicBackground = true;
+            exitTo(preNewGameState);
+        },
+        function(ctx,x,y,frame) {
+            drawExclamationPoint(ctx,x,y,DIR_RIGHT,getIconAnimFrame(frame));
+        });
 
     menu.addSpacer(0.5);
+	menu.addTextIconButton("SCORES",
+        function() {
+            exitTo(scoreState);
+        },
+        function(ctx,x,y,frame) {
+            drawCherry(ctx,x,y);
+        });
     menu.addTextIconButton("LEARN",
         function() {
             exitTo(learnState);
@@ -1244,12 +1272,15 @@ var readyNewState = newChildObject(readyState, {
         if (gameMode == GAME_PACMAN) {
             map = mapPacman;
         }
-        else if (gameMode == GAME_MSPACMAN || gameMode == GAME_OTTO) {
+        else if (gameMode == GAME_MSPACMAN) {
             setNextMsPacMap();
         }
         else if (gameMode == GAME_COOKIE) {
             setNextCookieMap();
         }
+		else if (gameMode == GAME_OTTO) {
+			setNextCrazyOttoMap();
+		}
         map.resetCurrent();
         fruit.onNewLevel();
         renderer.drawMap();
@@ -1287,7 +1318,7 @@ var readyRestartState = newChildObject(readyState, {
 var playState = {
     init: function() {
 
-		audioAnalyser = new AudioAnalyser(audioIn, -100, -0.1, 0.97, 2048, false);
+		audioAnalyser = new AudioAnalyser(audioIn, -200, -0.1, 0.99, 2048, false);
 
         if (practiceMode) {
             vcr.reset();

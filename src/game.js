@@ -6,6 +6,7 @@ var GAME_PACMAN = 0;
 var GAME_MSPACMAN = 1;
 var GAME_COOKIE = 2;
 var GAME_OTTO = 3;
+var GAME_CUSTOM = 4;
 
 var practiceMode = false;
 var turboMode = false;
@@ -15,7 +16,7 @@ var gameMode = GAME_PACMAN;
 var getGameName = (function(){
 
     var names = ["PAC-MAN", "MS PAC-MAN", "COOKIE-MAN","CRAZY OTTO"];
-    
+
     return function(mode) {
         if (mode == undefined) {
             mode = gameMode;
@@ -71,7 +72,7 @@ var getGameDescription = (function(){
             "SHAUN WILLIAMS",
         ],
     ];
-    
+
     return function(mode) {
         if (mode == undefined) {
             mode = gameMode;

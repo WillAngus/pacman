@@ -23,7 +23,7 @@ function createWindow() {
 	// Open the DevTools.
 	mainWindow.webContents.openDevTools()
 
-	//systemPreferences.askForMediaAccess('microphone');
+	// systemPreferences.askForMediaAccess('microphone');
 }
 
 // This method will be called when Electron has finished

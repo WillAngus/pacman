@@ -50,6 +50,14 @@ var inGameMenu = (function() {
     menu.addTextButton("RESUME", function() {
         menu.disable();
     });
+	menu.addTextButton("RESTART", function() {
+        showConfirm("RESTART?", function() {
+			practiceMode = false;
+            turboMode = false;
+            newGameState.setStartLevel(1);
+            switchState(newGameState, 60);
+        });
+    });
     menu.addTextButton("QUIT", function() {
         showConfirm("QUIT GAME?", function() {
             switchState(homeState, 60);
@@ -175,4 +183,3 @@ var inGameMenu = (function() {
         },
     };
 })();
-
