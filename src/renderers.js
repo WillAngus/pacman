@@ -718,12 +718,12 @@ var initRenderer = function(){
 					// bgCtx.strokeStyle = 'rgb('+audioAnalyser.low*  2+', '+audioAnalyser.mid*1.5+', '+audioAnalyser.high*6.5+')';
 
 					/* Change hue based on audio volume */
-					bgCtx.fillStyle   = 'hsl('+audioAnalyser.signal_volume+',  90%, 60%)';
-					bgCtx.strokeStyle = 'hsl('+audioAnalyser.signal_volume+', 100%, 25%)';
+					// bgCtx.fillStyle   = 'hsl('+audioAnalyser.signal_volume+',  90%, 60%)';
+					// bgCtx.strokeStyle = 'hsl('+audioAnalyser.signal_volume+', 100%, 25%)';
 
 					/* Change hue based on audio bands */
-					// bgCtx.fillStyle   = 'hsl('+((audioAnalyser.signal_volume*2)-audioAnalyser.mid)+',  90%, '+(225-audioAnalyser.low)+'%)';
-					// bgCtx.strokeStyle = 'hsl('+((audioAnalyser.signal_volume*2)-audioAnalyser.mid)+', 100%, 25%)';
+					bgCtx.fillStyle   = 'hsl('+audioAnalyser.signal_volume*2+',  90%, '+audioAnalyser.high/2+'%)';
+					bgCtx.strokeStyle = 'hsl('+audioAnalyser.signal_volume*2+', 100%, 25%)';
 				}
                 else {
                     bgCtx.fillStyle = map.wallFillColor;

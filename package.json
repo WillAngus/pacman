@@ -1,15 +1,15 @@
 {
-  "name": "electron-quick-start",
+  "name": "pacman",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "Pacman packaged.",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
-  "repository": "https://github.com/electron/electron-quick-start",
+  "repository": "https://github.com/WillAngus/pacman",
   "keywords": [
     "Electron",
-    "quick",
+    "pacman",
     "start",
     "tutorial",
     "demo"

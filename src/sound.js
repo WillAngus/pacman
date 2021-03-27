@@ -109,7 +109,7 @@ function createAudioGroup() {
 
 function audioTrack(url, volume) {
 	var audio = new Pizzicato.Sound(url, function() {
-		// audio.volume = 0;
+		audio.volume = 0;
 		audioArray.push(audio);
 		console.log(url + ' loaded.');
 		if (audioArray.length == 15) {
